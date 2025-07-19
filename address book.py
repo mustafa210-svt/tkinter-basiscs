@@ -1,9 +1,92 @@
-import tkinter 
+import tkinter
+import tkinter.filedialog
+import tkinter.messagebox 
 
 #screen
 screen = tkinter.Tk()
 screen.geometry("500x500")
 screen.title("Address book")
+
+add_book = {}
+
+#functions
+
+def add_button():
+    name = e1.get()
+    adr = e2.get()
+    numb = e3.get()
+    email = e4.get()
+    dob = e5.get()
+
+    add_book[name] = [adr,numb,email,dob]
+    update()
+    e1.delete(0,tkinter.END)
+    e2.delete(0,tkinter.END)
+    e3.delete(0,tkinter.END)
+    e4.delete(0,tkinter.END)
+    e5.delete(0,tkinter.END)
+
+
+
+def update():
+    lb.delete(0,tkinter.END)
+
+    for key in add_book.keys():
+        lb.insert(tkinter.END, key)
+        
+
+
+def delete_button():
+    global add_book
+    index = lb.curselection()
+    name = lb.get(index)
+    del add_book[name]
+    update()
+    
+def edit_button():
+    global add_book
+    index = lb.curselection()
+    name = lb.get(index)
+    values = add_book[name]
+    e1.insert(tkinter.END, name)
+    e2.insert(tkinter.END, values[0])
+    e3.insert(tkinter.END, values[1])
+    e4.insert(tkinter.END, values[2])
+    e5.insert(tkinter.END, values[3])
+
+def save_button():
+    taskfile = tkinter.filedialog.asksaveasfile()
+    if taskfile is not None:
+        print(add_book,file= taskfile)
+
+def open_button():
+    global add_book
+    taskfile = tkinter.filedialog.askopenfile()
+    lb.delete(0,tkinter.END)
+    if taskfile is not None:
+        data = taskfile.read()
+        add_book = eval(data)
+        update()
+
+def viewinfo(event):
+    index = lb.curselection() 
+    name =lb.get(index)
+    records = add_book.get(name)
+    tkinter.messagebox.showinfo(name, "address ="+ records[0] + "\n Contact number=" + records[1] +"\n Email=" + records[2] + "\n Dob=" + records[3])
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #widgets 
@@ -24,14 +107,15 @@ email = tkinter.Label(screen, text= "Email")
 dob = tkinter.Label(screen, text= "Date of birth")
 
 #buttons
-open = tkinter.Button(screen, text= "Open", width= 10)
-edit = tkinter.Button(screen, text= "Edit", width = 10)
-delete = tkinter.Button(screen, text= "Delete", width= 10)
-save = tkinter.Button(screen, text= "Save", width= 30)
-add = tkinter.Button(screen, text= "Update/Add", width= 10)
+open = tkinter.Button(screen, text= "Open", width= 10, command= open_button)
+edit = tkinter.Button(screen, text= "Edit", width = 10, command= edit_button)
+delete = tkinter.Button(screen, text= "Delete", width= 10, command= delete_button)
+save = tkinter.Button(screen, text= "Save", width= 30, command= save_button)
+add = tkinter.Button(screen, text= "Update/Add", width= 10, command= add_button)
 
 #list box
 lb = tkinter.Listbox(screen, width=40, height= 20)
+lb.bind("<<ListboxSelect>>", viewinfo)
 
 
 #grid
